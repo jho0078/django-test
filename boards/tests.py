@@ -12,12 +12,26 @@ class SettingsTest(TestCase):
         self.assertEqual(settings.LANGUAGE_CODE, 'ko-kr')
         self.assertEqual(settings.TIME_ZONE, 'Asia/Seoul')
         
-# 2. Model test
+# 2. Model test + ModelForm test
 class BoardModelTest(TestCase):
     def test_01_model(self):
         # board = Board.objects.create(title='test title', content='test content')
         board = Board.objects.create(title='test title', content='test content', user_id=1)
         self.assertEqual(str(board), f'Board{board.pk}', msg='출력 값이 일치하지 않음')
+    
+    def test_02_boardform(self):
+        # given
+        data = {'title': '제목', 'content': '내용'}
+        # when then
+        self.assertEqual(BoardForm(data).is_valid(), True)
+        
+    def test_03_boardform_without_title(self):
+        data = {'content': '내용'}
+        self.assertEqual(BoardForm(data).is_valid(), False)
+        
+    def test_04_boardform_without_content(self):
+        data = {'title': '제목'}
+        self.assertEqual(BoardForm(data).is_valid(), False)
         
 # 3. View test
 # 기본 구조 : given - when - then
@@ -52,8 +66,9 @@ class BoardViewTest(TestCase):
         # when
         with self.login(username='test', password='qawsedrf!'):
             response = self.post('boards:create', data=data)
-            self.assertContains(response, '폼에 필수 항목입니다.!')
+            self.assertContains(response, '')
             # form.is_valid() 를 통과하지 못해서 팅겨져 나옴.
             
-
+# 4. ModelForm
+# class BoardModelTest(TestCase):
             
